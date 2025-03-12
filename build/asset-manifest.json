@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/stonefist-naming/static/css/main.e344ce76.css",
-    "main.js": "/stonefist-naming/static/js/main.1009f512.js",
-    "static/js/453.e4660c3c.chunk.js": "/stonefist-naming/static/js/453.e4660c3c.chunk.js",
-    "static/media/fist.png": "/stonefist-naming/static/media/fist.947e193a06ed14ea7cfb.png",
-    "index.html": "/stonefist-naming/index.html",
-    "main.e344ce76.css.map": "/stonefist-naming/static/css/main.e344ce76.css.map",
-    "main.1009f512.js.map": "/stonefist-naming/static/js/main.1009f512.js.map",
-    "453.e4660c3c.chunk.js.map": "/stonefist-naming/static/js/453.e4660c3c.chunk.js.map"
+    "main.css": "/palette-naming/static/css/main.31a95e54.css",
+    "main.js": "/palette-naming/static/js/main.debeb5a6.js",
+    "static/js/453.767d6cb5.chunk.js": "/palette-naming/static/js/453.767d6cb5.chunk.js",
+    "index.html": "/palette-naming/index.html",
+    "main.31a95e54.css.map": "/palette-naming/static/css/main.31a95e54.css.map",
+    "main.debeb5a6.js.map": "/palette-naming/static/js/main.debeb5a6.js.map",
+    "453.767d6cb5.chunk.js.map": "/palette-naming/static/js/453.767d6cb5.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e344ce76.css",
-    "static/js/main.1009f512.js"
+    "static/css/main.31a95e54.css",
+    "static/js/main.debeb5a6.js"
   ]
 }
