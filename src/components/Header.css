@@ -5,11 +5,11 @@
 
 .Header > .header-wrap {
   display: flex;
-  background-color: #313131;
+  background-color: #D7EEFE;
   align-items: center;
 }
 
-.Header > .header-wrap > .fist-icon {
+.Header > .header-wrap > .palette-icon {
   width: 24px;
   height: 24px;
   padding: 12px;
@@ -17,5 +17,5 @@
 
 .Header > .header-wrap > .title {
   font-size: 20px;
-  color: #FFCD69;
+  color: #2E85C9;
 }
