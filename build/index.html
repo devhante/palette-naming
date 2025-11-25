@@ -1,1 +1,277 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/palette-naming/palette.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="팀 팔레트 에셋 네이밍 컨벤션 헬퍼"/><link rel="manifest" href="/palette-naming/manifest.json"/><title>팀 팔레트 네이밍</title><script defer="defer" src="/palette-naming/static/js/main.debeb5a6.js"></script><link href="/palette-naming/static/css/main.31a95e54.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>컬러팅! 굿즈 뽑기</title>
+    <style>
+      body {
+        font-family: "Pretendard", Arial, sans-serif;
+        background: linear-gradient(135deg, #ffe6f2, #e6f0ff);
+        margin: 0;
+        padding: 30px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 32px;
+        color: #222;
+        margin-bottom: 15px;
+      }
+
+      button {
+        padding: 12px 25px;
+        font-size: 17px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        background-color: #ff78b7;
+        color: white;
+        margin: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.15s ease;
+      }
+      button:hover {
+        transform: scale(1.05);
+        background-color: #ff5fa8;
+      }
+      button:disabled {
+        background-color: #bbbbbb;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .card {
+        background: white;
+        padding: 20px;
+        width: 80%;
+        max-width: 450px;
+        margin: 20px auto;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      #result {
+        font-size: 26px;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.7s ease;
+      }
+
+      #remaining {
+        white-space: pre-line;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      #gachaBox {
+        width: 120px;
+        height: 120px;
+        margin: 25px auto;
+        background: #ffd1ec;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: bold;
+        color: #ff52a8;
+        opacity: 0;
+      }
+
+      @keyframes spinBox {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        50% {
+          transform: scale(1.15) rotate(180deg);
+        }
+        100% {
+          transform: scale(1) rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎁 컬러팅! 굿즈 뽑기</h1>
+
+    <button id="drawBtn" onclick="drawRandom()">✨ 지금 바로 뽑기</button>
+    <button onclick="resetPool()">🔄 전체 풀 리셋</button>
+    <button onclick="resetToday()">🗓 오늘 뽑은 수량만 리셋</button>
+
+    <div id="gachaBox">?</div>
+
+    <div class="card">
+      <div id="result"></div>
+    </div>
+
+    <div class="card">
+      <div id="remaining"></div>
+    </div>
+
+    <script>
+      /* ====== 데이터 초기화 관련 ====== */
+      function createInitialPool() {
+        return [
+          ...Array(20).fill("캐치 코롯토"),
+          ...Array(20).fill("라비 코롯토"),
+          ...Array(50).fill("캔뱃지 랜덤 3종"),
+          ...Array(150).fill("포토카드 랜덤 3종"),
+          ...Array(60).fill("판스티커"),
+        ];
+      }
+
+      function loadPool() {
+        const saved = localStorage.getItem("gachaPool");
+        if (saved) return JSON.parse(saved);
+
+        const initial = createInitialPool();
+        localStorage.setItem("gachaPool", JSON.stringify(initial));
+        return initial;
+      }
+
+      function savePool() {
+        localStorage.setItem("gachaPool", JSON.stringify(pool));
+      }
+
+      function loadTodayCount() {
+        const savedDate = localStorage.getItem("lastDate");
+        const today = new Date().toLocaleDateString();
+
+        if (savedDate !== today) {
+          localStorage.setItem("lastDate", today);
+          localStorage.setItem("todayCount", "0");
+          return 0;
+        }
+
+        return Number(localStorage.getItem("todayCount") || 0);
+      }
+
+      function saveTodayCount(n) {
+        localStorage.setItem("todayCount", n);
+      }
+
+      /* ====== 기본 데이터 ====== */
+      let pool = loadPool();
+      let todayCount = loadTodayCount();
+      const DAILY_LIMIT = 100;
+      let isDrawing = false; // 클릭 잠금
+
+      /* ====== 뽑기 기능 ====== */
+      function drawRandom() {
+        const resultBox = document.getElementById("result");
+        const gachaBox = document.getElementById("gachaBox");
+        const drawBtn = document.getElementById("drawBtn");
+
+        if (isDrawing) return;
+        isDrawing = true;
+
+        if (todayCount >= DAILY_LIMIT) {
+          resultBox.innerText = "🚫 오늘치 100개를 모두 소진했습니다!";
+          resultBox.style.opacity = "1";
+          drawBtn.disabled = true;
+          isDrawing = false;
+          return;
+        }
+
+        if (pool.length === 0) {
+          resultBox.innerText = "모든 뽑기가 소진되었습니다!";
+          resultBox.style.opacity = "1";
+          isDrawing = false;
+          return;
+        }
+
+        gachaBox.style.opacity = "1";
+        gachaBox.style.animation = "spinBox 0.7s ease";
+        resultBox.style.opacity = "0";
+
+        setTimeout(() => {
+          const index = Math.floor(Math.random() * pool.length);
+          const result = pool.splice(index, 1)[0];
+
+          savePool();
+
+          todayCount++;
+          saveTodayCount(todayCount);
+
+          gachaBox.style.animation = "none";
+          resultBox.innerText = `✨ 결과: ${result} ✨`;
+          resultBox.style.opacity = "1";
+
+          updateRemainingView();
+
+          if (todayCount >= DAILY_LIMIT) {
+            drawBtn.disabled = true;
+          }
+
+          isDrawing = false;
+        }, 700);
+      }
+
+      /* ====== 전체 풀 리셋 ====== */
+      function resetPool() {
+        if (!confirm("전체 풀을 초기화할까요? (오늘 뽑은 수량은 유지됨)"))
+          return;
+
+        pool = createInitialPool();
+        savePool();
+
+        document.getElementById("result").innerText = "🔄 전체 풀 초기화 완료!";
+        document.getElementById("result").style.opacity = "1";
+
+        updateRemainingView();
+      }
+
+      /* ====== 오늘 횟수만 리셋 ====== */
+      function resetToday() {
+        if (!confirm("오늘 뽑은 횟수를 0으로 초기화할까요?")) return;
+
+        todayCount = 0;
+        saveTodayCount(0);
+
+        document.getElementById("drawBtn").disabled = false;
+
+        document.getElementById("result").innerText =
+          "🗓 오늘 뽑은 수량이 초기화되었습니다!";
+        document.getElementById("result").style.opacity = "1";
+
+        updateRemainingView();
+      }
+
+      /* ====== 남은 수량 표시 ====== */
+      function updateRemainingView() {
+        const counts = {
+          "캐치 코롯토": 0,
+          "라비 코롯토": 0,
+          "캔뱃지 랜덤 3종": 0,
+          "포토카드 랜덤 3종": 0,
+          판스티커: 0,
+        };
+
+        pool.forEach((item) => counts[item]++);
+
+        document.getElementById("remaining").innerText = `📦 남은 수량
+
+캐치 코롯토: ${counts["캐치 코롯토"]}
+라비 코롯토: ${counts["라비 코롯토"]}
+캔뱃지 랜덤 3종: ${counts["캔뱃지 랜덤 3종"]}
+포토카드 랜덤 3종: ${counts["포토카드 랜덤 3종"]}
+판스티커: ${counts["판스티커"]}
+
+🎯 총 남은 뽑기: ${pool.length}
+🗓 오늘 뽑은 수량: ${todayCount} / 100`;
+
+        if (todayCount >= DAILY_LIMIT) {
+          document.getElementById("drawBtn").disabled = true;
+        }
+      }
+
+      updateRemainingView();
+
+      /* ====== 페이지 로드시 버튼 상태 보정 ====== */
+      if (todayCount >= DAILY_LIMIT) {
+        document.getElementById("drawBtn").disabled = true;
+      }
+    </script>
+  </body>
+</html>
