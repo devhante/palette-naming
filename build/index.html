@@ -1,277 +1,333 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <title>컬러팅! 굿즈 뽑기</title>
+    <title>귀여운 굿즈 뽑기 (텍스트 카드 버전)</title>
+
     <style>
-      body {
-        font-family: "Pretendard", Arial, sans-serif;
-        background: linear-gradient(135deg, #ffe6f2, #e6f0ff);
-        margin: 0;
-        padding: 30px;
-        text-align: center;
-      }
-
-      h1 {
-        font-size: 32px;
-        color: #222;
-        margin-bottom: 15px;
-      }
-
-      button {
-        padding: 12px 25px;
-        font-size: 17px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        background-color: #ff78b7;
-        color: white;
-        margin: 5px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: transform 0.15s ease;
-      }
-      button:hover {
-        transform: scale(1.05);
-        background-color: #ff5fa8;
-      }
-      button:disabled {
-        background-color: #bbbbbb;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .card {
-        background: white;
-        padding: 20px;
-        width: 80%;
-        max-width: 450px;
-        margin: 20px auto;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      }
-
-      #result {
-        font-size: 26px;
-        font-weight: bold;
-        opacity: 0;
-        transition: opacity 0.7s ease;
-      }
-
-      #remaining {
-        white-space: pre-line;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-
-      #gachaBox {
-        width: 120px;
-        height: 120px;
-        margin: 25px auto;
-        background: #ffd1ec;
-        border-radius: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        font-weight: bold;
-        color: #ff52a8;
-        opacity: 0;
-      }
-
-      @keyframes spinBox {
-        0% {
-          transform: scale(1) rotate(0deg);
+        body {
+            font-family: "Apple SD Gothic Neo", "Pretendard", sans-serif;
+            background: #ffeef8;
+            margin: 0;
+            text-align: center;
+            overflow-x: hidden;
         }
-        50% {
-          transform: scale(1.15) rotate(180deg);
+
+        h1 {
+            margin-top: 40px;
+            font-size: 36px;
+            color: #ff82b2;
+            text-shadow: 1px 1px 0 white;
         }
-        100% {
-          transform: scale(1) rotate(360deg);
+
+        .container {
+            margin-top: 40px;
+            position: relative;
         }
-      }
+
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff3fc;
+            border: 2px solid #ffc4e2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1);
+            background: #ffe0f3;
+        }
+
+        .settings-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 260px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid #ffc4e2;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .draw-btn {
+            font-size: 26px;
+            padding: 20px 60px;
+            background: #ff9bcd;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #e36ba3;
+            transition: 0.2s;
+        }
+
+        .spin { animation: spinAnim 0.6s ease; }
+
+        @keyframes spinAnim {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(360deg) scale(1.1); }
+            100% { transform: rotate(720deg) scale(1); }
+        }
+
+        .flip-card {
+            width: 260px;
+            height: 300px;
+            margin: 40px auto;
+            perspective: 1000px;
+        }
+
+        .flip-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .flip-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #ffc8e8, #ffe6f3);
+            color: white;
+            font-size: 34px;
+        }
+
+        .card-front {
+            background: #ffffff;
+            transform: rotateY(180deg);
+            color: #ff6fa8;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+            line-height: 1.3;
+        }
+
+        .flipped { transform: rotateY(180deg); }
+
+        .reset-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ff6b81;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .reset-btn:hover { background: #ff526c; }
+
+        .particle {
+            position: fixed;
+            font-size: 20px;
+            animation: particleMove 1.2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes particleMove {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.6); }
+        }
+
+        #stockPanel {
+            margin: 40px auto;
+            width: 340px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 15px 20px;
+            border: 2px solid #ffc4e2;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            text-align: left;
+            font-size: 18px;
+            color: #ff7abf;
+        }
+
+        #stockPanel h3 {
+            margin: 0 0 10px;
+            color: #ff489e;
+            font-size: 22px;
+        }
+
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
     </style>
-  </head>
-  <body>
-    <h1>🎁 컬러팅! 굿즈 뽑기</h1>
+</head>
 
-    <button id="drawBtn" onclick="drawRandom()">✨ 지금 바로 뽑기</button>
-    <button onclick="resetPool()">🔄 전체 풀 리셋</button>
-    <button onclick="resetToday()">🗓 오늘 뽑은 수량만 리셋</button>
+<body>
 
-    <div id="gachaBox">?</div>
+<h1>🐰 컬러팅 굿즈 뽑기 😻</h1>
 
-    <div class="card">
-      <div id="result"></div>
+<div class="container">
+
+    <button id="settingsBtn" class="settings-btn">⚙️</button>
+
+    <div id="settingsPanel" class="settings-panel hidden">
+        <h3>설정</h3>
+        <div id="stockSettings"></div>
+        <button id="resetBtn" class="reset-btn">🔄 재고 리셋</button>
     </div>
 
-    <div class="card">
-      <div id="remaining"></div>
+    <button id="drawBtn" class="draw-btn">🎁 뽑기!</button>
+
+    <div id="result"></div>
+
+    <div id="stockPanel">
+        <h3>📦 남은 수량</h3>
+        <div id="stockList"></div>
     </div>
 
-    <script>
-      /* ====== 데이터 초기화 관련 ====== */
-      function createInitialPool() {
-        return [
-          ...Array(20).fill("캐치 코롯토"),
-          ...Array(20).fill("라비 코롯토"),
-          ...Array(50).fill("캔뱃지 랜덤 3종"),
-          ...Array(150).fill("포토카드 랜덤 3종"),
-          ...Array(60).fill("판스티커"),
-        ];
-      }
+</div>
 
-      function loadPool() {
-        const saved = localStorage.getItem("gachaPool");
-        if (saved) return JSON.parse(saved);
+<script>
+    let initialStock = {
+        "캐치 코롯토": 6,
+        "라비 코롯토": 10,
+        "캔뱃지": 20,
+        "포토카드": 52,
+        "판스티커": 21
+    };
 
-        const initial = createInitialPool();
-        localStorage.setItem("gachaPool", JSON.stringify(initial));
-        return initial;
-      }
+    let goodsStock = { ...initialStock };
 
-      function savePool() {
-        localStorage.setItem("gachaPool", JSON.stringify(pool));
-      }
+    const drawBtn = document.getElementById("drawBtn");
+    const result = document.getElementById("result");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsPanel = document.getElementById("settingsPanel");
+    const stockSettings = document.getElementById("stockSettings");
+    const resetBtn = document.getElementById("resetBtn");
+    const stockList = document.getElementById("stockList");
 
-      function loadTodayCount() {
-        const savedDate = localStorage.getItem("lastDate");
-        const today = new Date().toLocaleDateString();
+    function refreshStockPanel() {
+        stockList.innerHTML = "";
 
-        if (savedDate !== today) {
-          localStorage.setItem("lastDate", today);
-          localStorage.setItem("todayCount", "0");
-          return 0;
+        Object.keys(goodsStock).forEach(name => {
+            const remaining = goodsStock[name];
+            const total = initialStock[name];
+
+            const div = document.createElement("div");
+            div.className = "stock-item";
+            div.innerHTML = `<span>${name}</span><span>${remaining} / ${total}</span>`;
+            stockList.appendChild(div);
+        });
+    }
+
+    refreshStockPanel();
+
+    settingsBtn.addEventListener("click", () => {
+        settingsPanel.classList.toggle("hidden");
+        renderStockSettings();
+    });
+
+    function renderStockSettings() {
+        stockSettings.innerHTML = "";
+        Object.keys(goodsStock).forEach(name => {
+            let div = document.createElement("div");
+            div.style.marginBottom = "8px";
+
+            div.innerHTML = `
+      <label>${name} : </label>
+      <input type="number" id="stock-${name}" value="${goodsStock[name]}" min="0" style="width:60px;">
+    `;
+            stockSettings.appendChild(div);
+        });
+    }
+
+    drawBtn.addEventListener("click", () => {
+        drawBtn.classList.add("spin");
+        setTimeout(() => drawBtn.classList.remove("spin"), 600);
+
+        const available = Object.keys(goodsStock).filter(n => goodsStock[n] > 0);
+        if (available.length === 0) {
+            result.innerHTML = "<p style='color:#ff5e7d;font-size:22px;'>재고 소진!</p>";
+            return;
         }
 
-        return Number(localStorage.getItem("todayCount") || 0);
-      }
+        const selected = available[Math.floor(Math.random() * available.length)];
+        goodsStock[selected]--;
 
-      function saveTodayCount(n) {
-        localStorage.setItem("todayCount", n);
-      }
+        refreshStockPanel();
+        showFlipCard(selected);
+        spawnParticles(20);
+    });
 
-      /* ====== 기본 데이터 ====== */
-      let pool = loadPool();
-      let todayCount = loadTodayCount();
-      const DAILY_LIMIT = 100;
-      let isDrawing = false; // 클릭 잠금
-
-      /* ====== 뽑기 기능 ====== */
-      function drawRandom() {
-        const resultBox = document.getElementById("result");
-        const gachaBox = document.getElementById("gachaBox");
-        const drawBtn = document.getElementById("drawBtn");
-
-        if (isDrawing) return;
-        isDrawing = true;
-
-        if (todayCount >= DAILY_LIMIT) {
-          resultBox.innerText = "🚫 오늘치 100개를 모두 소진했습니다!";
-          resultBox.style.opacity = "1";
-          drawBtn.disabled = true;
-          isDrawing = false;
-          return;
-        }
-
-        if (pool.length === 0) {
-          resultBox.innerText = "모든 뽑기가 소진되었습니다!";
-          resultBox.style.opacity = "1";
-          isDrawing = false;
-          return;
-        }
-
-        gachaBox.style.opacity = "1";
-        gachaBox.style.animation = "spinBox 0.7s ease";
-        resultBox.style.opacity = "0";
-
+    function showFlipCard(name) {
+        result.innerHTML = `
+    <div class="flip-card">
+      <div class="flip-inner" id="flipInner">
+        <div class="flip-face card-back">🐿️</div>
+        <div class="flip-face card-front">${name}</div>
+      </div>
+    </div>
+  `;
         setTimeout(() => {
-          const index = Math.floor(Math.random() * pool.length);
-          const result = pool.splice(index, 1)[0];
+            document.getElementById("flipInner").classList.add("flipped");
+        }, 50);
+    }
 
-          savePool();
+    function spawnParticles(count) {
+        const shapes = ["✨", "💖", "⭐"];
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement("div");
+            p.className = "particle";
+            p.innerHTML = shapes[Math.floor(Math.random() * shapes.length)];
 
-          todayCount++;
-          saveTodayCount(todayCount);
+            p.style.left = (window.innerWidth / 2 + (Math.random() * 200 - 100)) + "px";
+            p.style.top = (window.innerHeight / 2 + 50) + "px";
+            p.style.animationDuration = (0.8 + Math.random() * 0.6) + "s";
 
-          gachaBox.style.animation = "none";
-          resultBox.innerText = `✨ 결과: ${result} ✨`;
-          resultBox.style.opacity = "1";
-
-          updateRemainingView();
-
-          if (todayCount >= DAILY_LIMIT) {
-            drawBtn.disabled = true;
-          }
-
-          isDrawing = false;
-        }, 700);
-      }
-
-      /* ====== 전체 풀 리셋 ====== */
-      function resetPool() {
-        if (!confirm("전체 풀을 초기화할까요? (오늘 뽑은 수량은 유지됨)"))
-          return;
-
-        pool = createInitialPool();
-        savePool();
-
-        document.getElementById("result").innerText = "🔄 전체 풀 초기화 완료!";
-        document.getElementById("result").style.opacity = "1";
-
-        updateRemainingView();
-      }
-
-      /* ====== 오늘 횟수만 리셋 ====== */
-      function resetToday() {
-        if (!confirm("오늘 뽑은 횟수를 0으로 초기화할까요?")) return;
-
-        todayCount = 0;
-        saveTodayCount(0);
-
-        document.getElementById("drawBtn").disabled = false;
-
-        document.getElementById("result").innerText =
-          "🗓 오늘 뽑은 수량이 초기화되었습니다!";
-        document.getElementById("result").style.opacity = "1";
-
-        updateRemainingView();
-      }
-
-      /* ====== 남은 수량 표시 ====== */
-      function updateRemainingView() {
-        const counts = {
-          "캐치 코롯토": 0,
-          "라비 코롯토": 0,
-          "캔뱃지 랜덤 3종": 0,
-          "포토카드 랜덤 3종": 0,
-          판스티커: 0,
-        };
-
-        pool.forEach((item) => counts[item]++);
-
-        document.getElementById("remaining").innerText = `📦 남은 수량
-
-캐치 코롯토: ${counts["캐치 코롯토"]}
-라비 코롯토: ${counts["라비 코롯토"]}
-캔뱃지 랜덤 3종: ${counts["캔뱃지 랜덤 3종"]}
-포토카드 랜덤 3종: ${counts["포토카드 랜덤 3종"]}
-판스티커: ${counts["판스티커"]}
-
-🎯 총 남은 뽑기: ${pool.length}
-🗓 오늘 뽑은 수량: ${todayCount} / 100`;
-
-        if (todayCount >= DAILY_LIMIT) {
-          document.getElementById("drawBtn").disabled = true;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1500);
         }
-      }
+    }
 
-      updateRemainingView();
+    stockSettings.addEventListener("change", () => {
+        Object.keys(goodsStock).forEach(name => {
+            const input = document.getElementById(`stock-${name}`);
+            goodsStock[name] = Number(input.value);
+        });
+        refreshStockPanel();
+    });
 
-      /* ====== 페이지 로드시 버튼 상태 보정 ====== */
-      if (todayCount >= DAILY_LIMIT) {
-        document.getElementById("drawBtn").disabled = true;
-      }
-    </script>
-  </body>
+    resetBtn.addEventListener("click", () => {
+        goodsStock = { ...initialStock };
+        refreshStockPanel();
+        renderStockSettings();
+        result.innerHTML = "<p style='color:#ff7abf;'>재고가 초기화되었습니다!</p>";
+    });
+</script>
+
+</body>
 </html>
